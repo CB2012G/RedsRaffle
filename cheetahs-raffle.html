@@ -534,6 +534,22 @@
 
         window.addEventListener('load', function() {
 
+            // Pre-select player from URL parameter e.g. ?player=Ava+Ghandour
+            (function() {
+                var params = new URLSearchParams(window.location.search);
+                var playerParam = params.get('player');
+                if (playerParam) {
+                    var select = document.getElementById('playerSupport');
+                    for (var i = 0; i < select.options.length; i++) {
+                        if (select.options[i].value.toLowerCase() === playerParam.toLowerCase()) {
+                            select.value = select.options[i].value;
+                            break;
+                        }
+                    }
+                }
+                updateSummary();
+            })();
+
             document.getElementById('btn-increase').addEventListener('click', function() {
                 selectedTickets++;
                 updateTicketDisplay();
