@@ -216,6 +216,7 @@
                     <p>Buy any number of tickets you want!<br>
                     <b>$20 per ticket</b><br>
                     <b>3 for $50</b> (Save $10!)<br>
+                    <b>10 for $100</b> (Save $100!)<br>
                     More tickets = more chances to win!</p>
                 </div>
                 <div class="info-card">
@@ -308,8 +309,21 @@
         <!-- Ticket Selector -->
         <div class="pricing-section" style="background:var(--cb-black);color:white;border:4px solid var(--cb-red);">
             <h2 style="margin:0;text-align:center;color:var(--accent-gold);">SELECT YOUR TICKETS</h2>
-            <p style="text-align:center;margin:15px 0 5px 0;font-size:14px;">Each ticket is $20 or get 3 for $50</p>
-            <div style="text-align:center;margin-top:25px;">
+            <p style="text-align:center;margin:15px 0 5px 0;font-size:14px;">1 for $20 &nbsp;|&nbsp; 3 for $50 &nbsp;|&nbsp; 10 for $100</p>
+
+            <!-- Bundle Quick-Select -->
+            <div style="display:flex;justify-content:center;gap:14px;margin:22px 0 10px 0;flex-wrap:wrap;">
+                <label id="bundle-3-label" style="display:flex;align-items:center;gap:10px;background:#1e1e1e;border:2px solid #444;border-radius:10px;padding:14px 20px;cursor:pointer;transition:0.2s;min-width:160px;justify-content:center;">
+                    <input type="checkbox" id="bundle-3" style="width:20px;height:20px;accent-color:var(--cb-red);cursor:pointer;flex-shrink:0;">
+                    <span style="font-weight:800;font-size:15px;color:white;line-height:1.3;text-align:center;">3 tickets<br><span style="color:var(--accent-gold);">$50 bundle</span></span>
+                </label>
+                <label id="bundle-10-label" style="display:flex;align-items:center;gap:10px;background:#1e1e1e;border:2px solid #444;border-radius:10px;padding:14px 20px;cursor:pointer;transition:0.2s;min-width:160px;justify-content:center;">
+                    <input type="checkbox" id="bundle-10" style="width:20px;height:20px;accent-color:var(--cb-red);cursor:pointer;flex-shrink:0;">
+                    <span style="font-weight:800;font-size:15px;color:white;line-height:1.3;text-align:center;">10 tickets<br><span style="color:var(--accent-gold);">$100 bundle</span></span>
+                </label>
+            </div>
+
+            <div style="text-align:center;margin-top:18px;">
                 <div class="ticket-selector">
                     <button class="ticket-btn" id="btn-decrease">&#8722;</button>
                     <div style="text-align:center;">
@@ -435,13 +449,31 @@
         var totalPrice = 0;
 
         function calculatePrice(tickets) {
-            var sets = Math.floor(tickets / 3);
-            var rem  = tickets % 3;
-            return (sets * 50) + (rem * 20);
+            var tens = Math.floor(tickets / 10);
+            var rem1 = tickets % 10;
+            var threes = Math.floor(rem1 / 3);
+            var rem2 = rem1 % 3;
+            return (tens * 100) + (threes * 50) + (rem2 * 20);
         }
 
         function calculateSavings(tickets) {
             return (tickets * 20) - calculatePrice(tickets);
+        }
+
+        function syncBundleCheckboxes() {
+            var b3  = document.getElementById('bundle-3');
+            var b10 = document.getElementById('bundle-10');
+            var l3  = document.getElementById('bundle-3-label');
+            var l10 = document.getElementById('bundle-10-label');
+            if (!b3 || !b10) return;
+            var is3  = (selectedTickets === 3);
+            var is10 = (selectedTickets === 10);
+            b3.checked  = is3;
+            b10.checked = is10;
+            l3.style.borderColor  = is3  ? 'var(--cb-red)' : '#444';
+            l10.style.borderColor = is10 ? 'var(--cb-red)' : '#444';
+            l3.style.background   = is3  ? '#2a0000' : '#1e1e1e';
+            l10.style.background  = is10 ? '#2a0000' : '#1e1e1e';
         }
 
         function updateTicketDisplay() {
@@ -457,6 +489,7 @@
             } else {
                 msg.textContent = '';
             }
+            syncBundleCheckboxes();
             updateSummary();
         }
 
@@ -511,6 +544,16 @@
                     selectedTickets--;
                     updateTicketDisplay();
                 }
+            });
+
+            document.getElementById('bundle-3').addEventListener('change', function() {
+                selectedTickets = this.checked ? 3 : 0;
+                updateTicketDisplay();
+            });
+
+            document.getElementById('bundle-10').addEventListener('change', function() {
+                selectedTickets = this.checked ? 10 : 0;
+                updateTicketDisplay();
             });
 
             document.getElementById('userName').addEventListener('input', updateSummary);
