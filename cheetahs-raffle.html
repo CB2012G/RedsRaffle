@@ -306,6 +306,9 @@
             </div>
         </div>
 
+        <!-- Player pre-select banner (shown when URL param is used) -->
+        <div id="player-banner" style="display:none;background:linear-gradient(135deg,#1a4a1a,#0a2a0a);color:#4caf50;border:3px solid #4caf50;border-radius:10px;padding:16px 24px;margin-bottom:20px;text-align:center;font-size:18px;font-weight:900;letter-spacing:1px;"></div>
+
         <!-- Ticket Selector -->
         <div class="pricing-section" style="background:var(--cb-black);color:white;border:4px solid var(--cb-red);">
             <h2 style="margin:0;text-align:center;color:var(--accent-gold);">SELECT YOUR TICKETS</h2>
@@ -536,14 +539,34 @@
 
             // Pre-select player from URL parameter e.g. ?player=Ava+Ghandour
             (function() {
-                var params = new URLSearchParams(window.location.search);
-                var playerParam = params.get('player');
+                var search = window.location.search || window.location.href.split('?')[1] || '';
+                var playerParam = null;
+                if (search) {
+                    search = search.replace(/^\?/, '');
+                    var parts = search.split('&');
+                    for (var p = 0; p < parts.length; p++) {
+                        var kv = parts[p].split('=');
+                        if (kv[0].toLowerCase() === 'player' && kv[1]) {
+                            playerParam = decodeURIComponent(kv[1].replace(/\+/g, ' '));
+                            break;
+                        }
+                    }
+                }
                 if (playerParam) {
                     var select = document.getElementById('playerSupport');
+                    var matched = false;
                     for (var i = 0; i < select.options.length; i++) {
                         if (select.options[i].value.toLowerCase() === playerParam.toLowerCase()) {
                             select.value = select.options[i].value;
+                            matched = true;
                             break;
+                        }
+                    }
+                    if (matched) {
+                        var banner = document.getElementById('player-banner');
+                        if (banner) {
+                            banner.textContent = '\u26BD Supporting: ' + select.value;
+                            banner.style.display = 'block';
                         }
                     }
                 }
